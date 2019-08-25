@@ -11,9 +11,14 @@ from keras.models import Sequential
 from keras.applications import VGG19
 from keras.layers import Dense, Conv2D, MaxPooling2D
 
-# image files.
+# image files path.
 content_img = "content_img.jpg"
 style_img = "style_img.jpg"
+
+def load_image(image_path):
+	img = load_img(image_path)
+	img = VGG19.preprocess_input(img)
+	return img
 
 # reading content and style images.
 content_img = cv2.resize(cv2.imread(content_img),(int(244),int(244)))
