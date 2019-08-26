@@ -50,6 +50,13 @@ model = VGG19(weights = "imagenet",
 # Layers of the model should not be trainable:-
 model.trainable = False
 
+# feature_extraction :-
+def features(img,konsa):
+    sudo_model = get_model()
+    sudo_t = sudo_model(img)
+    sudo_t = {"content":[sudo_t[0]],"style":sudo_t[1:-1]}
+    return sudo_t[konsa]
+
 #content_loss:-
 def content_loss(base_img,target_img): #images are in matrix form(pixels)
     return tf.reduce_mean(tf.square(base_img - target_img))
