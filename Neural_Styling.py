@@ -50,6 +50,30 @@ model = VGG19(weights = "imagenet",
 # Layers of the model should not be trainable:-
 model.trainable = False
 
+#content_loss:-
+def content_loss(base_img,target_img): #images are in matrix form(pixels)
+    return tf.reduce_mean(tf.square(base_img - target_img))
+
+# main loop:-
+c_weights = 1
+s_weights = 1e4
+for i in range(iterations):
+    # content loss
+    content_loss = content_loss(features(content_img,"content")[0], features(init_img,"content")[0])
+    
+    # style loss
+    for i in range(len(style_layers)):
+        loss = (gram_matrix(features(style_img,"style")[i]) - gram_matrix(features(init_img,"style"))[i])**2
+        style_loss +=loss*float(0.25)
+        
+    #total_loss:-
+    total_loss = content_loss*c_weight + style_loss*s_weight
+    
+    # calulating gradient/slope:-
+    grad = cal_gradient(total_loss,base_img)
+    # optimize
+    opt.apply(grad,base_image)
+
 # style_loss:-
 
 # content_loss:-
