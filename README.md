@@ -4,3 +4,16 @@
 # DAY: 01
         started Reading about style transfer..from medium : https://medium.com/tensorflow/neural-style-transfer-creating-art-with-deep-learning-using-tf-keras-and-eager-execution-7d541ac31398
         There is a paper written on neural style transfer by Leon A. Gatys :https://arxiv.org/pdf/1508.06576.pdf
+        
+# DAY: 02
+    Try to understand loss functions:-
+    1>content loss/  
+    2>style loss/  
+    *watch Andrew Ng lectures on style transfer*.
+  
+# DAY: 03
+    Understand why we are using middle layers and not the first and last layers. 
+    select content and style layers.
+# DAY: 04
+    Read about the dimesion flow of tensor...It will help you to write code.  
+    
