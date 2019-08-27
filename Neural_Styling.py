@@ -10,6 +10,10 @@ from keras import models
 from keras.models import Sequential
 from keras.applications import VGG19
 from keras.layers import Dense, Conv2D, MaxPooling2D
+from tensorflow.python.keras import models
+
+# for eager_execution:-
+tf.enable_eager_execution()
 
 # image files path.
 content_img = "content_img.jpg"
@@ -44,9 +48,13 @@ style_layers =[ 'block1_conv1',
 				]
 
 # using VGG19 pretrained model for extracting feature_maps:-
-model = VGG19(weights = "imagenet",
-			  include_top = False
-			  )
+def get_model():
+    model = tf.keras.applications.vgg19.VGG19(include_top=False, weights='imagenet')
+    model.trainable = False
+    style = [model.get_layer(name).output for name in style_layers]
+    content = [model.get_layer(name).output for name in content_layers]
+    model_output = content+style
+    return models.Model(model.input,model_output)
 # Layers of the model should not be trainable:-
 model.trainable = False
 
@@ -61,29 +69,25 @@ def features(img,konsa):
 def content_loss(base_img,target_img): #images are in matrix form(pixels)
     return tf.reduce_mean(tf.square(base_img - target_img))
 
+# variables:-
+iterations = 1
+norm_means = np.array([103.939, 116.779, 123.68])
+min_value = -norm_means
+max_value = 255 - norm_means 
+style_loss =0
+opt = tf.train.AdamOptimizer(learning_rate=5, beta1=0.99, epsilon=1e-1)
+init_img = tfe.Variable(content_img,dtype=tf.float32)
+c_weight = 1e3
+s_weight = 1e-2
+
 # main loop:-
-c_weights = 1
-s_weights = 1e4
-for i in range(iterations):
-    # content loss
-    content_loss = content_loss(features(content_img,"content")[0], features(init_img,"content")[0])
-    
-    # style loss
-    for i in range(len(style_layers)):
-        loss = (gram_matrix(features(style_img,"style")[i]) - gram_matrix(features(init_img,"style"))[i])**2
-        style_loss +=loss*float(0.25)
-        
-    #total_loss:-
-    total_loss = content_loss*c_weight + style_loss*s_weight
-    
+sess = tf.Session()
+best_loss = float('inf')
+for i in range(100):
     # calulating gradient/slope:-
-    grad = cal_gradient(total_loss,base_img)
+    grad = cal_slope(init_img)
     # optimize
-    opt.apply(grad,base_image)
+    opt.apply_gradients([(grad, init_img)])
+    
 
-# style_loss:-
-
-# content_loss:-
-
-# fetch_img():-
 
